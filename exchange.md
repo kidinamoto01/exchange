@@ -1,4 +1,5 @@
-##Token Management
+Token Management
+------------
 
 * addToken(string symbol_name, address erc20TokenAddress) onlyowner
   * Add a token with a symbol_name
@@ -6,7 +7,8 @@
 * hasToken(string symbol_name) constant returns(bool)
   * Returns true if a token can be traded
 
-##Funds Management
+Funds Management
+------------
 
 * depositToken(string symbol_name,uint amount)
   * Try to send tokens in the name of the msg.sender to the exchange contract
@@ -18,7 +20,8 @@
 * getBalance(string symbol_name) constant returns(uint)
   * returns the token balance for the address that calls
 
-##Ethereum Funds management
+Ethereum Funds management
+------------
 
 * depositEther() payable
   * is payable
@@ -30,7 +33,8 @@
 * getEthBalanceInWei() constant returns (uint)
   * returns the current balance
 
-##Place Orders
+Place Orders
+------------
 
 * buyToken(string token, uint priceInWei,uint amount)
   * try to buy amount of tokens for priceInWei each
@@ -44,7 +48,8 @@
      * Order Executed
   * else: a limit order is created
 
-##order management
+order management
+------------
 
 * cancelOrder(string symbol_name,bool is_sell_order,uint priceInWei,uint offerKey)
   * cancel an order from the calling-address for a certain token for a specific price
