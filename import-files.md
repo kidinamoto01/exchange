@@ -20,3 +20,9 @@ Detail
   * Use EthPM as the new package manager for Ethereum
   * Via NPM
   * Normal source files in a folder
+
+* Remix
+  * cannot import directly from Github
+  * import "github.com/ethereum/dapp-bin/library/iterable_mapping.sol"as it_    mapping;
+  * Import from SWARM
+    * bzzr://<hash>
