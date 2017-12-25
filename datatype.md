@@ -51,3 +51,13 @@ Structure OrderBook
   * higherPrice
   * lowerPrice
   * Offers and offer_index
+
+Offers
+------------
+
+* A stack of Offers
+* FIFO
+  * User1 sell 10 tokens for 15 & User2 sell 5 tokens for 15
+  * User3 buy 10 for 15
+    * Buy from User1 first
+* Build up a stack
