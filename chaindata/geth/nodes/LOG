@@ -1,0 +1,39 @@
+=============== Dec 21, 2017 (CST) ===============
+17:23:26.388532 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+17:23:26.391167 db@open opening
+17:23:26.399295 version@stat F·[] S·0B[] Sc·[]
+17:23:26.400598 db@janitor F·2 G·0
+17:23:26.400770 db@open done T·9.572781ms
+17:25:05.911378 db@close closing
+17:25:05.911809 db@close done T·429.652µs
+=============== Dec 21, 2017 (CST) ===============
+17:25:15.616455 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+17:25:15.624135 version@stat F·[] S·0B[] Sc·[]
+17:25:15.624170 db@open opening
+17:25:15.624373 journal@recovery F·1
+17:25:15.630283 journal@recovery recovering @1
+17:25:15.633422 memdb@flush created L0@2 N·151 S·1KiB "n:\x11..ing,v151":"version,v1"
+17:25:15.640883 version@stat F·[1] S·1KiB[1KiB] Sc·[0.25]
+17:25:15.643641 db@janitor F·3 G·0
+17:25:15.643681 db@open done T·19.498767ms
+=============== Dec 22, 2017 (CST) ===============
+14:03:45.696779 db@close closing
+14:03:45.704576 db@close done T·7.795364ms
+=============== Dec 22, 2017 (CST) ===============
+14:03:58.282033 log@legend F·NumFile S·FileSize N·Entry C·BadEntry B·BadBlock Ke·KeyError D·DroppedEntry L·Level Q·SeqNum T·TimeElapsed
+14:03:58.284110 version@stat F·[1] S·1KiB[1KiB] Sc·[0.25]
+14:03:58.284149 db@open opening
+14:03:58.284319 journal@recovery F·1
+14:03:58.287496 journal@recovery recovering @3
+14:03:58.470220 memdb@flush created L0@5 N·36906 S·347KiB "n:\x11..ing,v37056":"n:\xa9..ing,v154"
+14:03:58.473120 version@stat F·[2] S·348KiB[348KiB] Sc·[0.50]
+14:03:58.475813 db@janitor F·4 G·0
+14:03:58.475837 db@open done T·191.674558ms
+14:03:58.832424 table@compaction L0·2 -> L1·0 S·348KiB Q·37059
+14:03:58.845067 table@build created L1@8 N·7 S·661B "n:\x11..ing,v37056":"version,v1"
+14:03:58.845205 version@stat F·[0 1] S·661B[0B 661B] Sc·[0.00 0.00]
+14:03:58.845509 table@compaction committed F-1 S-348KiB Ke·0 D·37050 T·12.908365ms
+14:04:00.448745 table@remove removed @5
+14:04:00.448874 table@remove removed @2
+17:26:58.334530 db@close closing
+17:26:58.342632 db@close done T·8.156044ms
