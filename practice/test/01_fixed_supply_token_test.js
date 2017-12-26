@@ -29,4 +29,15 @@ contract('MyToken', function(accounts) {
         });
     });
 
+
+    it("second account should have no tokens", function() {
+        var myTokenInstance;
+        return fixedSupplyToken.deployed().then(function(instance) {
+            myTokenInstance = instance;
+            return myTokenInstance.balanceOf(accounts[1]);
+        }).then(function(accountBalance) {
+            assert.equal(accountBalance.toNumber(), 0, "No token is owned by the second account");
+        });
+    });
+
 });
