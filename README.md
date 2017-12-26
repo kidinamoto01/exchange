@@ -1,4 +1,4 @@
-# exchange
+# Build Your Own Exchange with Truffle & Testrpc 
 ## Start your own testnet
 
 Init the chain:
@@ -13,3 +13,6 @@ Start Mist Wallet:
 
 /Applications/Mist.app/Contents/MacOS/Mist --rpc /Users/b/Documents/ethereum/dex/chaindata/geth.ipc
 
+## Install truffle & testrpc
+
+`npm install -g truffle`
