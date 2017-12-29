@@ -197,6 +197,40 @@ contract Exchange is owned {
     // ORDER BOOK - BID ORDERS //
     /////////////////////////////
     function getBuyOrderBook(string symbolName) constant returns (uint[], uint[]) {
+        uint8 tokenNameIndex = getSymbolIndexOrThrow(symbolName);
+        uint[] memory arrPricesBuy = new uint[](tokens[tokenNameIndex].amountBuyPrices);
+        uint[] memory arrVolumesBuy = new uint[](tokens[tokenNameIndex].amountBuyPrices);
+
+        uint whilePrice = tokens[tokenNameIndex].lowestBuyPrice;
+        uint counter = 0;
+        if (tokens[tokenNameIndex].curBuyPrice > 0) {
+            while (whilePrice <= tokens[tokenNameIndex].curBuyPrice) {
+                arrPricesBuy[counter] = whilePrice;
+                uint volumeAtPrice = 0;
+                uint offers_key = 0;
+
+                offers_key = tokens[tokenNameIndex].buyBook[whilePrice].offers_key;
+                while (offers_key <= tokens[tokenNameIndex].buyBook[whilePrice].offers_length) {
+                    volumeAtPrice += tokens[tokenNameIndex].buyBook[whilePrice].offers[offers_key].amount;
+                    offers_key++;
+                }
+
+                arrVolumesBuy[counter] = volumeAtPrice;
+
+                //next whilePrice
+                if (whilePrice == tokens[tokenNameIndex].buyBook[whilePrice].higherPrice) {
+                    break;
+                }
+                else {
+                    whilePrice = tokens[tokenNameIndex].buyBook[whilePrice].higherPrice;
+                }
+                counter++;
+
+            }
+        }
+
+        return (arrPricesBuy, arrVolumesBuy);
+
     }
 
 
@@ -383,8 +417,8 @@ contract Exchange is owned {
             }
             else if (curSellPrice > priceInWei) {
                 //the offer to sell is the lowest one, we don't need to find the right spot
-                tokens[tokenIndex].sellBook[curBuyPrice].lowerPrice = priceInWei;
-                tokens[tokenIndex].sellBook[priceInWei].higherPrice = curBuyPrice;
+                tokens[tokenIndex].sellBook[curSellPrice].lowerPrice = priceInWei;
+                tokens[tokenIndex].sellBook[priceInWei].higherPrice = curSellPrice;
                 tokens[tokenIndex].sellBook[priceInWei].lowerPrice = priceInWei;
                 tokens[tokenIndex].curSellPrice = priceInWei;
 
