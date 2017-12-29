@@ -207,16 +207,108 @@ contract Exchange is owned {
     }
 
 
-
     ////////////////////////////
     // NEW ORDER - BID ORDER //
     ///////////////////////////
     function buyToken(string symbolName, uint priceInWei, uint amount) {
+        uint8 tokenNameIndex = getSymbolIndexOrThrow(symbolName);
+        uint total_amount_ether_necessary = 0;
+        uint total_amount_ether_available = 0;
+
+        //if we have enough ether, we can buy that:
+        total_amount_ether_necessary = amount*priceInWei;
+
+        //overflow check
+        require(total_amount_ether_necessary >= amount);
+        require(total_amount_ether_necessary >= priceInWei);
+        require(balanceEthForAddress[msg.sender] >= total_amount_ether_necessary);
+        require(balanceEthForAddress[msg.sender] - total_amount_ether_necessary >= 0);
+
+        //first deduct the amount of ether from our balance
+        balanceEthForAddress[msg.sender] -= total_amount_ether_necessary;
+
+        // create a new limit order when the price doesn't exist or is higher than current sell price
+        if (tokens[tokenNameIndex].amountSellPrices == 0 || tokens[tokenNameIndex].curSellPrice > priceInWei) {
+            //tokens[tokenNameIndex].amountSellPrices == 0 means nobody is selling
+            //limit order: we don't have enough offers to fulfill the amount
+
+            //add the order to the orderBook
+            addBuyOffer(tokenNameIndex, priceInWei, amount, msg.sender);
+            //and emit the event.
+            LimitBuyOrderCreated(tokenNameIndex, msg.sender, amount, priceInWei, tokens[tokenNameIndex].buyBook[priceInWei].offers_length);
+        } else {
+            //market order: current sell price is smaller or equal to buy price!
+
+            revert(); //just for now, throw an exception
+        }
     }
 
 
+  
+    ///////////////////////////
+    // BID LIMIT ORDER LOGIC //
+    ///////////////////////////
+    function addBuyOffer(uint8 tokenIndex, uint priceInWei, uint amount, address who) internal {
+        tokens[tokenIndex].buyBook[priceInWei].offers_length++;
+        tokens[tokenIndex].buyBook[priceInWei].offers[tokens[tokenIndex].buyBook[priceInWei].offers_length] = Offer(amount, who);
 
 
+        if (tokens[tokenIndex].buyBook[priceInWei].offers_length == 1) {
+            tokens[tokenIndex].buyBook[priceInWei].offers_key = 1;
+            //we have a new buy order - increase the counter, so we can set the getOrderBook array later
+            tokens[tokenIndex].amountBuyPrices++;
+
+
+            //lowerPrice and higherPrice have to be set
+            uint curBuyPrice = tokens[tokenIndex].curBuyPrice;
+
+            uint lowestBuyPrice = tokens[tokenIndex].lowestBuyPrice;
+            if (lowestBuyPrice == 0 || lowestBuyPrice > priceInWei) {
+                if (curBuyPrice == 0) {
+                    //there is no buy order yet, we insert the first one...
+                    tokens[tokenIndex].curBuyPrice = priceInWei;
+                    tokens[tokenIndex].buyBook[priceInWei].higherPrice = priceInWei;
+                    tokens[tokenIndex].buyBook[priceInWei].lowerPrice = 0;
+                } else {
+                    //or the lowest one
+                    tokens[tokenIndex].buyBook[lowestBuyPrice].lowerPrice = priceInWei;
+                    tokens[tokenIndex].buyBook[priceInWei].higherPrice = lowestBuyPrice;
+                    tokens[tokenIndex].buyBook[priceInWei].lowerPrice = 0;
+                }
+                tokens[tokenIndex].lowestBuyPrice = priceInWei;
+            }
+            else if (curBuyPrice < priceInWei) {
+                //the offer to buy is the highest one, we don't need to find the right spot
+                tokens[tokenIndex].buyBook[curBuyPrice].higherPrice = priceInWei;
+                tokens[tokenIndex].buyBook[priceInWei].higherPrice = priceInWei;
+                tokens[tokenIndex].buyBook[priceInWei].lowerPrice = curBuyPrice;
+                tokens[tokenIndex].curBuyPrice = priceInWei;
+
+            }
+            else {
+                //we are somewhere in the middle, we need to find the right spot first...
+
+                uint buyPrice = tokens[tokenIndex].curBuyPrice;
+                bool weFoundIt = false;
+                while (buyPrice > 0 && !weFoundIt) {
+                    if (buyPrice < priceInWei &&tokens[tokenIndex].buyBook[buyPrice].higherPrice > priceInWei) {
+                        //set the new order-book entry higher/lowerPrice first right
+                        tokens[tokenIndex].buyBook[priceInWei].lowerPrice = buyPrice;
+                        tokens[tokenIndex].buyBook[priceInWei].higherPrice = tokens[tokenIndex].buyBook[buyPrice].higherPrice;
+
+                        //set the higherPrice'd order-book entries lowerPrice to the current Price
+                        tokens[tokenIndex].buyBook[tokens[tokenIndex].buyBook[buyPrice].higherPrice].lowerPrice = priceInWei;
+                        //set the lowerPrice'd order-book entries higherPrice to the current Price
+                        tokens[tokenIndex].buyBook[buyPrice].higherPrice = priceInWei;
+
+                        //set we found it.
+                        weFoundIt = true;
+                    }
+                    buyPrice = tokens[tokenIndex].buyBook[buyPrice].lowerPrice;
+                }
+            }
+        }
+    }
 
     ////////////////////////////
     // NEW ORDER - ASK ORDER //
@@ -239,19 +331,19 @@ contract Exchange is owned {
     // STRING COMPARISON FUNCTION //
     ////////////////////////////////
     function stringsEqual(string storage _a, string memory _b) internal returns (bool) {
-bytes storage a = bytes(_a);
-bytes memory b = bytes(_b);
-if (a.length != b.length) {
-return false;
-}
-// @todo unroll this loop
-for (uint i = 0; i < a.length; i ++) {
-if (a[i] != b[i]) {
-return false;
-}
-}
-return true;
-}
+        bytes storage a = bytes(_a);
+        bytes memory b = bytes(_b);
+        if (a.length != b.length) {
+            return false;
+        }
+        // @todo unroll this loop
+        for (uint i = 0; i < a.length; i ++) {
+            if (a[i] != b[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
 
 
 }
