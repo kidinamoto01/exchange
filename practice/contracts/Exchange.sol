@@ -486,6 +486,28 @@ contract Exchange is owned {
     // CANCEL LIMIT ORDER LOGIC //
     //////////////////////////////
     function cancelOrder(string symbolName, bool isSellOrder, uint priceInWei, uint offerKey) {
+         uint8 symbolNameIndex = getSymbolIndexOrThrow(symbolName);
+        if (isSellOrder) {
+            require(tokens[symbolNameIndex].sellBook[priceInWei].offers[offerKey].who == msg.sender);
+
+            uint tokensAmount = tokens[symbolNameIndex].sellBook[priceInWei].offers[offerKey].amount;
+            require(tokenBalanceForAddress[msg.sender][symbolNameIndex] + tokensAmount >= tokenBalanceForAddress[msg.sender][symbolNameIndex]);
+
+
+            tokenBalanceForAddress[msg.sender][symbolNameIndex] += tokensAmount;
+            tokens[symbolNameIndex].sellBook[priceInWei].offers[offerKey].amount = 0;
+            SellOrderCanceled(symbolNameIndex, priceInWei, offerKey);
+
+        }
+        else {
+            require(tokens[symbolNameIndex].buyBook[priceInWei].offers[offerKey].who == msg.sender);
+            uint etherToRefund = tokens[symbolNameIndex].buyBook[priceInWei].offers[offerKey].amount * priceInWei;
+            require(balanceEthForAddress[msg.sender] + etherToRefund >= balanceEthForAddress[msg.sender]);
+
+            balanceEthForAddress[msg.sender] += etherToRefund;
+            tokens[symbolNameIndex].buyBook[priceInWei].offers[offerKey].amount = 0;
+            BuyOrderCanceled(symbolNameIndex, priceInWei, offerKey);
+        }
     }
 
 
