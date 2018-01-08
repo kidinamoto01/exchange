@@ -111,6 +111,7 @@ contract('Simple Order Tests', function (accounts) {
             */
            assert.equal(txResult.logs.length, 1, "There should have been one Log Message emitted.");
            assert.equal(txResult.logs[0].event, "LimitBuyOrderCreated", "The Log-Event should be LimitBuyOrderCreated");
+           //emit from Event
            orderKey = txResult.logs[0].args._orderKey;
             console.log(orderKey)
            return myExchangeInstance.getBuyOrderBook.call("FIXED");
