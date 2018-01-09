@@ -130,7 +130,7 @@ window.App = {
     var tokenInstance;
     TokenContract.deployed().then(function(instance) {
       tokenInstance = instance;
-      tokenInstance.allEvents({},{fromBlock:1, toBlock:'latest'}).watch(function(error, result) {
+      tokenInstance.allEvents({fromBlock:1, toBlock:'latest'}).watch(function(error, result) {
         var alertbox = document.createElement("div");
         alertbox.setAttribute("class", "alert alert-info  alert-dismissible");
         var closeBtn = document.createElement("button");
