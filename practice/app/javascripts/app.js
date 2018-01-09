@@ -54,6 +54,33 @@ window.App = {
   },
   printImportantInformation: function() {
     //print out some important information
+    ExchangeContract.deployed().then(function(instance) {
+      var divAddress = document.createElement("div");
+      divAddress.appendChild(document.createTextNode("Address Exchange: " + instance.address));
+      divAddress.setAttribute("class", "alert alert-info");
+      document.getElementById("importantInformation").appendChild(divAddress);
+    });
+    TokenContract.deployed().then(function(instance) {
+      var divAddress = document.createElement("div");
+      divAddress.appendChild(document.createTextNode("Address Token: " + instance.address));
+      divAddress.setAttribute("class", "alert alert-info");
+      document.getElementById("importantInformation").appendChild(divAddress);
+    });
+
+    web3.eth.getAccounts(function(err, accs) {
+      web3.eth.getBalance(accs[0], function(err1, balance) {
+        var divAddress = document.createElement("div");
+        var div = document.createElement("div");
+        div.appendChild(document.createTextNode("Active Account: " + accs[0]));
+        var div2 = document.createElement("div");
+        div2.appendChild(document.createTextNode("Balance in Ether: " + web3.fromWei(balance, "ether")));
+        divAddress.appendChild(div);
+        divAddress.appendChild(div2);
+        divAddress.setAttribute("class", "alert alert-info");
+        document.getElementById("importantInformation").appendChild(divAddress);
+      });
+
+    });
   },
   /**
    * Exchange specific functions here
@@ -67,6 +94,17 @@ window.App = {
   },
   addTokenToExchange: function() {
 	//function to add tokens to the exchange
+  var nameOfToken = document.getElementById("inputNameTokenAddExchange").value;
+    var addressOfToken = document.getElementById("inputAddressTokenAddExchange").value;
+    ExchangeContract.deployed().then(function(instance) {
+      return instance.addToken(nameOfToken, addressOfToken, {from: account});
+    }).then(function(txResult) {
+      console.log(txResult);
+      App.setStatus("Token added");
+    }).catch(function(e) {
+      console.log(e);
+      App.setStatus("Error getting balance; see log.");
+    });
   },
   refreshBalanceExchange: function() {
 	//refresh your balance
