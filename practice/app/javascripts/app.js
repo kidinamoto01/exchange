@@ -111,12 +111,56 @@ window.App = {
   },
   depositEther: function() {
   	  //deposit ether function
+    var amountEther = document.getElementById("inputAmountWithdrawalEther").value; 
+    var exchangeInstance;
+    console.log(amountEther)
+    ExchangeContract.deployed().then(function(instance){
+      exchangeInstance = instance;
+      return exchangeInstance.depositEther({from:account,value:web3.toWei(amountEther,"Ether")});
+    }).then(function(txResult){
+      console.log(txResult);
+      App.refreshBalanceExchange();
+
+    }).catch(function(e){
+      console.log(e);
+      App.setStatus("Error getting balance,see log");
+    });
   },
   withdrawEther: function() {
 	//withdraw ether function
+  var amountEther = document.getElementById("inputAmountDepositEther").value; 
+    var exchangeInstance;
+    console.log(amountEther)
+    ExchangeContract.deployed().then(function(instance){
+      exchangeInstance = instance;
+      return exchangeInstance.withdrawEther(web3.toWei(amountEther,"Ether"),{from:account});
+    }).then(function(txResult){
+      console.log(txResult);
+      App.refreshBalanceExchange();
+
+    }).catch(function(e){
+      console.log(e);
+      App.setStatus("Error getting balance,see log");
+    });
   },
   depositToken: function() {
 	//deposit token function
+    var amountToken = document.getElementById("inputAmountDepositToken").value; 
+    var nameToken = document.getElementById("inputNameDepositToken").value;
+    var exchangeInstance;
+    console.log(amountToken)
+    console.log(nameToken)
+    ExchangeContract.deployed().then(function(instance){
+      exchangeInstance = instance;
+      return exchangeInstance.depositToken(nameToken,amountToken,{from:account,gas:4500000});
+    }).then(function(txResult){
+      console.log(txResult);
+      App.refreshBalanceExchange();
+
+    }).catch(function(e){
+      console.log(e);
+      App.setStatus("Error getting balance,see log");
+    });
   },
   /**
    * TRADING FUNCTIONS FROM HERE ON
