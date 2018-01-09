@@ -87,7 +87,9 @@ window.App = {
    */
   initExchange: function() {
     //init Exchange
-
+    App.refreshBalanceExchange();
+    App.printImportantInformation();
+    App.watchExchangeEvents();
   },
   watchExchangeEvents: function() {
     //watch for Exchange Events
@@ -107,11 +109,28 @@ window.App = {
     });
   },
   refreshBalanceExchange: function() {
-	//refresh your balance
+  //refresh your balance
+    var self = this;
+
+    var exchangeInstance;
+    ExchangeContract.deployed().then(function(instance) {
+      exchangeInstance = instance;
+      return exchangeInstance.getBalance("FIXED");
+    }).then(function(value) {
+      var balance_element = document.getElementById("balanceTokenInExchange");
+      balance_element.innerHTML = value.toNumber();
+      return exchangeInstance.getEthBalanceInWei();
+    }).then(function(value) {
+      var balance_element = document.getElementById("balanceEtherInExchange");
+      balance_element.innerHTML = web3.fromWei(value, "ether");
+    }).catch(function(e) {
+      console.log(e);
+      self.setStatus("Error getting balance; see log.");
+    });
   },
   depositEther: function() {
   	  //deposit ether function
-    var amountEther = document.getElementById("inputAmountWithdrawalEther").value; 
+    var amountEther = document.getElementById("inputAmountDepositEther").value; 
     var exchangeInstance;
     console.log(amountEther)
     ExchangeContract.deployed().then(function(instance){
@@ -128,7 +147,7 @@ window.App = {
   },
   withdrawEther: function() {
 	//withdraw ether function
-  var amountEther = document.getElementById("inputAmountDepositEther").value; 
+  var amountEther = document.getElementById("inputAmountWithdrawalEther").value; 
     var exchangeInstance;
     console.log(amountEther)
     ExchangeContract.deployed().then(function(instance){
@@ -152,7 +171,7 @@ window.App = {
     console.log(nameToken)
     ExchangeContract.deployed().then(function(instance){
       exchangeInstance = instance;
-      return exchangeInstance.depositToken(nameToken,amountToken,{from:account,gas:4500000});
+      return exchangeInstance.depositToken(nameToken,amountToken,{from:account});
     }).then(function(txResult){
       console.log(txResult);
       App.refreshBalanceExchange();
@@ -176,6 +195,116 @@ window.App = {
   },
   listenToTradingEvents: function() {
 //listen to trading events
+   var exchangeInstance;
+        ExchangeContract.deployed().then(function (instance) {
+            exchangeInstance = instance;
+
+            exchangeInstance.LimitSellOrderCreated({}, {
+                fromBlock: 0,
+                toBlock: 'latest'
+            }).watch(function (error, result) {
+                var alertbox = document.createElement("div");
+                alertbox.setAttribute("class", "alert alert-info  alert-dismissible");
+                var closeBtn = document.createElement("button");
+                closeBtn.setAttribute("type", "button");
+                closeBtn.setAttribute("class", "close");
+                closeBtn.setAttribute("data-dismiss", "alert");
+                closeBtn.innerHTML = "<span>&times;</span>";
+                alertbox.appendChild(closeBtn);
+
+                var eventTitle = document.createElement("div");
+                eventTitle.innerHTML = '<strong>New Event: ' + result.event + '</strong>';
+                alertbox.appendChild(eventTitle);
+
+
+                var argsBox = document.createElement("textarea");
+                argsBox.setAttribute("class", "form-control");
+                argsBox.innerText = JSON.stringify(result.args);
+                alertbox.appendChild(argsBox);
+                document.getElementById("limitdorderEvents").appendChild(alertbox);
+                //document.getElementById("tokenEvents").innerHTML += '<div class="alert alert-info  alert-dismissible" role="alert"> <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button><div></div><div>Args: '+JSON.stringify(result.args) + '</div></div>';
+            });
+
+
+            exchangeInstance.LimitBuyOrderCreated({}, {
+                fromBlock: 0,
+                toBlock: 'latest'
+            }).watch(function (error, result) {
+                var alertbox = document.createElement("div");
+                alertbox.setAttribute("class", "alert alert-info  alert-dismissible");
+                var closeBtn = document.createElement("button");
+                closeBtn.setAttribute("type", "button");
+                closeBtn.setAttribute("class", "close");
+                closeBtn.setAttribute("data-dismiss", "alert");
+                closeBtn.innerHTML = "<span>&times;</span>";
+                alertbox.appendChild(closeBtn);
+
+                var eventTitle = document.createElement("div");
+                eventTitle.innerHTML = '<strong>New Event: ' + result.event + '</strong>';
+                alertbox.appendChild(eventTitle);
+
+
+                var argsBox = document.createElement("textarea");
+                argsBox.setAttribute("class", "form-control");
+                argsBox.innerText = JSON.stringify(result.args);
+                alertbox.appendChild(argsBox);
+                document.getElementById("limitdorderEvents").appendChild(alertbox);
+                //document.getElementById("tokenEvents").innerHTML += '<div class="alert alert-info  alert-dismissible" role="alert"> <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button><div></div><div>Args: '+JSON.stringify(result.args) + '</div></div>';
+            });
+
+
+
+            exchangeInstance.SellOrderFulfilled({}, {fromBlock: 0, toBlock: 'latest'}).watch(function (error, result) {
+                var alertbox = document.createElement("div");
+                alertbox.setAttribute("class", "alert alert-info  alert-dismissible");
+                var closeBtn = document.createElement("button");
+                closeBtn.setAttribute("type", "button");
+                closeBtn.setAttribute("class", "close");
+                closeBtn.setAttribute("data-dismiss", "alert");
+                closeBtn.innerHTML = "<span>&times;</span>";
+                alertbox.appendChild(closeBtn);
+
+                var eventTitle = document.createElement("div");
+                eventTitle.innerHTML = '<strong>New Event: ' + result.event + '</strong>';
+                alertbox.appendChild(eventTitle);
+
+
+                var argsBox = document.createElement("textarea");
+                argsBox.setAttribute("class", "form-control");
+                argsBox.innerText = JSON.stringify(result.args);
+                alertbox.appendChild(argsBox);
+                document.getElementById("fulfilledorderEvents").appendChild(alertbox);
+                //document.getElementById("tokenEvents").innerHTML += '<div class="alert alert-info  alert-dismissible" role="alert"> <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button><div></div><div>Args: '+JSON.stringify(result.args) + '</div></div>';
+            });
+
+
+            exchangeInstance.BuyOrderFulfilled({}, {fromBlock: 0, toBlock: 'latest'}).watch(function (error, result) {
+                var alertbox = document.createElement("div");
+                alertbox.setAttribute("class", "alert alert-info  alert-dismissible");
+                var closeBtn = document.createElement("button");
+                closeBtn.setAttribute("type", "button");
+                closeBtn.setAttribute("class", "close");
+                closeBtn.setAttribute("data-dismiss", "alert");
+                closeBtn.innerHTML = "<span>&times;</span>";
+                alertbox.appendChild(closeBtn);
+
+                var eventTitle = document.createElement("div");
+                eventTitle.innerHTML = '<strong>New Event: ' + result.event + '</strong>';
+                alertbox.appendChild(eventTitle);
+
+
+                var argsBox = document.createElement("textarea");
+                argsBox.setAttribute("class", "form-control");
+                argsBox.innerText = JSON.stringify(result.args);
+                alertbox.appendChild(argsBox);
+                document.getElementById("fulfilledorderEvents").appendChild(alertbox);
+                //document.getElementById("tokenEvents").innerHTML += '<div class="alert alert-info  alert-dismissible" role="alert"> <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button><div></div><div>Args: '+JSON.stringify(result.args) + '</div></div>';
+            });
+
+        }).catch(function (e) {
+            console.log(e);
+            App.setStatus("Error getting balance; see log.");
+        });
   },
   sellToken: function() {
  //sell token
@@ -191,6 +320,7 @@ window.App = {
     App.updateTokenBalance();
     App.watchTokenEvents();
     App.printImportantInformation();
+     App.refreshBalanceExchange();
   },
   updateTokenBalance: function() {
    
